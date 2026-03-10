@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Should You Get That Loan?<br><span class="hero-accent">Let AI Help You Decide.</span></h1>
+        <p class="hero-sub">Free, instant loan eligibility check powered by transparent AI. No sign-up needed. Get personalized tips, calculate your EMI, or analyze your own dataset.</p>
+        <div class="hero-actions">
+            <a href="/check" class="btn btn-primary btn-lg">Check My Eligibility</a>
+            <a href="/emi" class="btn btn-outline btn-lg">Calculate EMI</a>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features-grid">
+    <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Instant Eligibility Check</h3>
+        <p>Enter your details and get an AI-powered assessment in seconds. Understand your approval chances before you apply.</p>
+        <a href="/check" class="feature-link">Check now &rarr;</a>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🧮</div>
+        <h3>EMI Calculator</h3>
+        <p>Plan your monthly payments before borrowing. See a full amortization breakdown with principal vs. interest split.</p>
+        <a href="/emi" class="feature-link">Calculate &rarr;</a>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Analyze Your Data</h3>
+        <p>Upload your own loan dataset (CSV) and get a full trustworthiness report — model accuracy, data drift, and confidence analysis.</p>
+        <a href="/analyze" class="feature-link">Upload data &rarr;</a>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">💡</div>
+        <h3>Credit Tips & Guides</h3>
+        <p>Actionable advice to improve your credit score, reduce debt, and boost your chances of loan approval.</p>
+        <a href="/tips" class="feature-link">Read tips &rarr;</a>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Transparent AI</h3>
+        <p>Every prediction shows a confidence score and trust level. We never hide how the AI makes decisions.</p>
+        <a href="/how-it-works" class="feature-link">Learn more &rarr;</a>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Drift Detection</h3>
+        <p>Our system continuously monitors for data drift — if the model can't be trusted, it tells you honestly.</p>
+        <a href="/how-it-works" class="feature-link">See how &rarr;</a>
+    </div>
+</section>
+
+<!-- How it works summary -->
+<section class="card cta-section">
+    <h2>How Does It Work?</h2>
+    <div class="steps-row">
+        <div class="step">
+            <div class="step-num">1</div>
+            <h4>Enter Your Info</h4>
+            <p>Age, income, credit score, loan amount, term, and employment status.</p>
+        </div>
+        <div class="step-arrow">&rarr;</div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <h4>AI Analyzes</h4>
+            <p>The model predicts approval and calculates how confident it is.</p>
+        </div>
+        <div class="step-arrow">&rarr;</div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <h4>Trust Decision</h4>
+            <p>Based on confidence and data drift, you get a clear recommendation.</p>
+        </div>
+        <div class="step-arrow">&rarr;</div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <h4>Personalized Tips</h4>
+            <p>Actionable advice tailored to your profile to improve your odds.</p>
+        </div>
+    </div>
+    <div style="text-align:center; margin-top:1.5rem">
+        <a href="/check" class="btn btn-primary">Try It Free &rarr;</a>
+    </div>
+</section>
+{% endblock %}

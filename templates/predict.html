@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Predict{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Loan Application Prediction</h1>
+
+<div class="predict-layout">
+    <!-- Input Form -->
+    <section class="card form-card">
+        <h2>Enter Applicant Details</h2>
+        <form method="POST" action="/predict" id="predictForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" min="18" max="100" required
+                           value="{{ request.form.get('age', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="income">Annual Income ($)</label>
+                    <input type="number" id="income" name="income" min="0" required
+                           value="{{ request.form.get('income', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="credit_score">Credit Score</label>
+                    <input type="number" id="credit_score" name="credit_score" min="300" max="900" required
+                           value="{{ request.form.get('credit_score', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="loan_amount">Loan Amount ($)</label>
+                    <input type="number" id="loan_amount" name="loan_amount" min="0" required
+                           value="{{ request.form.get('loan_amount', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="loan_term">Loan Term (months)</label>
+                    <select id="loan_term" name="loan_term" required>
+                        <option value="">Select term</option>
+                        {% for t in [12, 24, 36, 48, 60] %}
+                        <option value="{{ t }}" {% if request.form.get('loan_term') == t|string %}selected{% endif %}>
+                            {{ t }} months
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="employment_status">Employment Status</label>
+                    <select id="employment_status" name="employment_status" required>
+                        <option value="">Select status</option>
+                        {% for s in ["Employed", "Self-Employed", "Unemployed"] %}
+                        <option value="{{ s }}" {% if request.form.get('employment_status') == s %}selected{% endif %}>
+                            {{ s }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze Application</button>
+        </form>
+    </section>
+
+    <!-- Result -->
+    {% if result %}
+    <section class="card result-card">
+        {% if result.error %}
+            <div class="result-error">
+                <h2>Error</h2>
+                <p>{{ result.error }}</p>
+            </div>
+        {% else %}
+            <h2>Prediction Result</h2>
+
+            <div class="result-prediction {{ 'approved' if result.prediction == 'Approved' else 'rejected' }}">
+                <span class="result-icon">
+                    {% if result.prediction == 'Approved' %}✅{% else %}❌{% endif %}
+                </span>
+                <span class="result-text">{{ result.prediction }}</span>
+            </div>
+
+            <div class="result-details">
+                <div class="result-item">
+                    <span class="result-label">Confidence</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ result.confidence }}%"></div>
+                    </div>
+                    <span class="result-value">{{ result.confidence }}%</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">P(Reject)</span>
+                    <span class="result-value">{{ result.probabilities.reject }}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">P(Approve)</span>
+                    <span class="result-value">{{ result.probabilities.approve }}%</span>
+                </div>
+
+                <div class="result-item trust-decision">
+                    <span class="result-label">Trust Decision</span>
+                    <span class="badge
+                        {% if result.decision == 'AUTO_APPROVE' %}badge-success
+                        {% elif result.decision == 'REVIEW_REQUIRED' %}badge-warning
+                        {% else %}badge-danger{% endif %}">
+                        {{ result.decision }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="decision-explanation">
+                {% if result.decision == 'AUTO_APPROVE' %}
+                    <p>High confidence, no drift detected. Safe to auto-approve.</p>
+                {% elif result.decision == 'REVIEW_REQUIRED' %}
+                    <p>Moderate confidence or drift detected. Human review recommended.</p>
+                {% else %}
+                    <p>Low confidence. This prediction should not be trusted without further analysis.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

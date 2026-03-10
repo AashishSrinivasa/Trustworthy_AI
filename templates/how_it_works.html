@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}How It Works{% endblock %}
+
+{% block content %}
+<h1 class="page-title">How LoanSafe AI Works</h1>
+<p class="page-subtitle">We believe AI should be transparent. Here's exactly how our system makes predictions and why you can trust the results.</p>
+
+<!-- Pipeline -->
+<section class="pipeline">
+    <div class="pipeline-step">
+        <div class="pipeline-icon">📝</div>
+        <h3>1. You Enter Your Data</h3>
+        <p>Age, income, credit score, desired loan amount, term, and employment status. We don't store your data — it's processed in real-time and never saved.</p>
+    </div>
+    <div class="pipeline-connector"></div>
+    <div class="pipeline-step">
+        <div class="pipeline-icon">🤖</div>
+        <h3>2. ML Model Predicts</h3>
+        <p>A Logistic Regression model trained on loan approval data predicts whether your application would be approved or rejected. The model outputs probabilities for both outcomes.</p>
+    </div>
+    <div class="pipeline-connector"></div>
+    <div class="pipeline-step">
+        <div class="pipeline-icon">📊</div>
+        <h3>3. Confidence Scoring</h3>
+        <p>Instead of just "yes" or "no," we calculate how confident the model is. If the model says "approved" with 95% confidence vs. 55% confidence, those are very different situations — and you should know the difference.</p>
+    </div>
+    <div class="pipeline-connector"></div>
+    <div class="pipeline-step">
+        <div class="pipeline-icon">🔍</div>
+        <h3>4. Data Drift Detection</h3>
+        <p>We check if the data the model sees in production has shifted compared to its training data. If feature distributions have changed significantly, the model may not be reliable — and we tell you.</p>
+    </div>
+    <div class="pipeline-connector"></div>
+    <div class="pipeline-step">
+        <div class="pipeline-icon">🛡️</div>
+        <h3>5. Trust Decision</h3>
+        <p>Combining confidence and drift status, the system assigns one of three trust levels:</p>
+        <div class="trust-levels">
+            <div class="trust-level trust-high">
+                <strong>AUTO APPROVE</strong>
+                <span>Confidence ≥ 80% and no drift → safe to trust</span>
+            </div>
+            <div class="trust-level trust-medium">
+                <strong>REVIEW REQUIRED</strong>
+                <span>Confidence 60-80% or drift detected → seek expert review</span>
+            </div>
+            <div class="trust-level trust-low">
+                <strong>DO NOT TRUST</strong>
+                <span>Confidence &lt; 60% → prediction unreliable</span>
+            </div>
+        </div>
+    </div>
+    <div class="pipeline-connector"></div>
+    <div class="pipeline-step">
+        <div class="pipeline-icon">💡</div>
+        <h3>6. Personalized Tips</h3>
+        <p>Based on your specific inputs, you get tailored advice — like improving your credit score, adjusting loan amounts, or considering a different term — to improve your approval chances.</p>
+    </div>
+</section>
+
+<!-- Upload your own data -->
+<section class="card cta-section" style="margin-top:2rem;">
+    <h2>Bring Your Own Data</h2>
+    <p>If you have a loan dataset, you can upload it and our system will train a fresh model on YOUR data, then run the full trustworthiness pipeline — accuracy metrics, drift detection, and confidence analysis.</p>
+    <a href="/analyze" class="btn btn-primary btn-lg">Upload Dataset &rarr;</a>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details class="faq-item">
+        <summary>Is this a real loan approval?</summary>
+        <p>No. LoanSafe AI is an educational tool that estimates your eligibility based on a machine learning model. It is not affiliated with any bank or lending institution. Always consult a financial professional for real lending decisions.</p>
+    </details>
+    <details class="faq-item">
+        <summary>Do you store my data?</summary>
+        <p>No. Your inputs are processed in real-time to generate predictions and tips. Nothing is saved to disk or any database. Uploaded CSV files are analyzed in memory and not stored.</p>
+    </details>
+    <details class="faq-item">
+        <summary>What model do you use?</summary>
+        <p>We use Logistic Regression from scikit-learn, a well-established algorithm for binary classification. It's chosen for its interpretability and reliability.</p>
+    </details>
+    <details class="faq-item">
+        <summary>What is data drift?</summary>
+        <p>Data drift occurs when the statistical properties of the data the model receives in production differ from the training data. This can cause predictions to become unreliable. Our system detects this and warns you.</p>
+    </details>
+    <details class="faq-item">
+        <summary>Can I use my own dataset?</summary>
+        <p>Yes! Go to the <a href="/analyze">Analyze Data</a> page and upload a CSV with the required columns. The system will train a model on your data and generate a full trustworthiness report.</p>
+    </details>
+</section>
+{% endblock %}

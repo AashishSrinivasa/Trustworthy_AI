@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Analyze Your Dataset{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Analyze Your Own Loan Data</h1>
+<p class="page-subtitle">Upload a CSV file with loan application data and get a full AI trustworthiness report — model performance, data drift detection, and confidence analysis.</p>
+
+<div class="analyze-layout">
+    <!-- Upload form -->
+    <section class="card form-card">
+        <h2>Upload Dataset</h2>
+        <form method="POST" action="/analyze" enctype="multipart/form-data">
+            <div class="upload-zone" id="uploadZone">
+                <span class="upload-icon">📁</span>
+                <p>Drag &amp; drop a CSV file here, or click to browse</p>
+                <input type="file" name="dataset" accept=".csv" id="fileInput" required>
+                <span class="file-name" id="fileName"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg" style="margin-top:1rem; width:100%;">Analyze Dataset</button>
+        </form>
+
+        <div class="format-help">
+            <h3>Required CSV Format</h3>
+            <p>Your file must have these columns (case-sensitive):</p>
+            <div class="table-wrap">
+                <table class="format-table">
+                    <thead>
+                        <tr><th>Column</th><th>Type</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Age</td><td>Integer</td><td>35</td></tr>
+                        <tr><td>Income</td><td>Integer</td><td>72000</td></tr>
+                        <tr><td>Credit_Score</td><td>Integer</td><td>720</td></tr>
+                        <tr><td>Loan_Amount</td><td>Integer</td><td>25000</td></tr>
+                        <tr><td>Loan_Term</td><td>Integer</td><td>36</td></tr>
+                        <tr><td>Employment_Status</td><td>Text</td><td>Employed</td></tr>
+                        <tr><td>Loan_Approved</td><td>0 or 1</td><td>1</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="hint-text">Employment_Status values: Employed, Self-Employed, or Unemployed</p>
+            <a href="/data/loan_data.csv" download class="btn btn-outline" style="margin-top:.75rem;">Download Sample CSV</a>
+        </div>
+    </section>
+
+    <!-- Report -->
+    {% if report %}
+    <section class="card result-card" id="reportSection">
+        {% if report.error %}
+            <div class="result-error">
+                <h2>⚠️ Could Not Process</h2>
+                <p>{{ report.error }}</p>
+                {% if report.columns_found %}
+                <p style="margin-top:.5rem; color: var(--text-muted);">Columns found in your file: <code>{{ report.columns_found | join(', ') }}</code></p>
+                {% endif %}
+            </div>
+        {% else %}
+            <h2>📊 Trustworthiness Report</h2>
+            <p class="report-meta">Analyzed <strong>{{ report.rows }}</strong> rows &middot; <strong>{{ report.test_size }}</strong> test samples</p>
+
+            <!-- Metrics -->
+            <div class="card-grid" style="margin-top:1rem;">
+                <div class="card metric-card">
+                    <span class="metric-value">{{ report.metrics.accuracy }}%</span>
+                    <span class="metric-label">Accuracy</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-value">{{ report.metrics.precision }}%</span>
+                    <span class="metric-label">Precision</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-value">{{ report.metrics.recall }}%</span>
+                    <span class="metric-label">Recall</span>
+                </div>
+                <div class="card metric-card">
+                    <span class="metric-value">{{ report.metrics.f1 }}%</span>
+                    <span class="metric-label">F1 Score</span>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="chart-row" style="margin-top:1.25rem;">
+                <div class="chart-card-small"><canvas id="decisionChart"></canvas></div>
+                <div class="chart-card-small"><canvas id="confChart"></canvas></div>
+            </div>
+
+            <!-- Drift Table -->
+            <h3 style="margin-top:1.25rem;">
+                Data Drift
+                <span class="badge {% if report.drift_exists %}badge-danger{% else %}badge-success{% endif %}">
+                    {% if report.drift_exists %}Drift Found{% else %}No Drift{% endif %}
+                </span>
+            </h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Feature</th><th>Mean Diff</th><th>Drift?</th></tr></thead>
+                    <tbody>
+                        {% for row in report.drift_data %}
+                        <tr>
+                            <td>{{ row.feature }}</td>
+                            <td>{{ "%.4f"|format(row.mean_diff) }}</td>
+                            <td><span class="badge {% if row.drift_detected %}badge-danger{% else %}badge-success{% endif %}">{% if row.drift_detected %}Yes{% else %}No{% endif %}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sample Decisions -->
+            <h3 style="margin-top:1.25rem;">Sample Trust Decisions</h3>
+            <div class="table-wrap" style="max-height:300px; overflow-y:auto;">
+                <table>
+                    <thead><tr><th>#</th><th>Confidence</th><th>Decision</th></tr></thead>
+                    <tbody>
+                        {% for row in report.sample_decisions %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ "%.2f"|format(row.confidence * 100) }}%</td>
+                            <td><span class="badge
+                                {% if row.decision == 'AUTO_APPROVE' %}badge-success
+                                {% elif row.decision == 'REVIEW_REQUIRED' %}badge-warning
+                                {% else %}badge-danger{% endif %}">{{ row.decision }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+    {% else %}
+    <section class="card placeholder-card">
+        <div class="placeholder-content">
+            <span class="placeholder-icon">📊</span>
+            <h3>Your Report Will Appear Here</h3>
+            <p>Upload a loan dataset CSV and our AI will generate a full trustworthiness analysis — model metrics, drift detection, and confidence distribution.</p>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // File name display
+    document.getElementById('fileInput').addEventListener('change', function() {
+        const name = this.files[0]?.name || '';
+        document.getElementById('fileName').textContent = name;
+    });
+
+    // Drag and drop visual
+    const zone = document.getElementById('uploadZone');
+    zone.addEventListener('click', () => document.getElementById('fileInput').click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        document.getElementById('fileInput').files = e.dataTransfer.files;
+        document.getElementById('fileName').textContent = e.dataTransfer.files[0]?.name || '';
+    });
+</script>
+
+{% if report and not report.error %}
+<script>
+    const colorMap = {"AUTO_APPROVE":"#22c55e","REVIEW_REQUIRED":"#f59e0b","DO_NOT_TRUST":"#ef4444"};
+    const decData = {{ report.decision_counts|safe }};
+    new Chart(document.getElementById("decisionChart"), {
+        type:"doughnut",
+        data:{labels:Object.keys(decData),datasets:[{data:Object.values(decData),backgroundColor:Object.keys(decData).map(k=>colorMap[k]||"#6366f1")}]},
+        options:{responsive:true,plugins:{legend:{position:"bottom",labels:{color:"#e2e8f0"}},title:{display:true,text:"Trust Decisions",color:"#e2e8f0"}}}
+    });
+    new Chart(document.getElementById("confChart"), {
+        type:"bar",
+        data:{labels:{{ report.conf_labels|safe }},datasets:[{label:"Count",data:{{ report.conf_values|safe }},backgroundColor:"#6366f1",borderRadius:4}]},
+        options:{responsive:true,scales:{y:{beginAtZero:true,ticks:{color:"#94a3b8"}},x:{ticks:{color:"#94a3b8"}}},plugins:{legend:{display:false},title:{display:true,text:"Confidence Distribution",color:"#e2e8f0"}}}
+    });
+</script>
+{% endif %}
+{% endblock %}

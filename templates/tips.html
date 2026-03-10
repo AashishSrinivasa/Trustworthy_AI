@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Credit Tips{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Credit & Loan Tips</h1>
+<p class="page-subtitle">Practical, actionable advice to improve your credit score and boost your loan approval chances.</p>
+
+<div class="tips-grid">
+    <div class="tip-card">
+        <div class="tip-number">1</div>
+        <h3>Pay Bills on Time, Every Time</h3>
+        <p>Payment history makes up roughly 35% of your credit score. Even one missed payment can drop your score significantly. Set up autopay or calendar reminders.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Score</span>
+            <div class="progress-bar"><div class="progress-fill fill-success" style="width:90%"></div></div>
+            <span>Very High</span>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-number">2</div>
+        <h3>Keep Credit Utilization Below 30%</h3>
+        <p>If your credit limit is $10,000, try to keep your balance below $3,000. Lower utilization signals responsible borrowing. Below 10% is ideal.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Score</span>
+            <div class="progress-bar"><div class="progress-fill fill-success" style="width:80%"></div></div>
+            <span>High</span>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-number">3</div>
+        <h3>Don't Close Old Credit Cards</h3>
+        <p>Length of credit history matters. Closing your oldest card shortens your average account age and reduces available credit, both hurting your score.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Score</span>
+            <div class="progress-bar"><div class="progress-fill fill-warning" style="width:60%"></div></div>
+            <span>Medium</span>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-number">4</div>
+        <h3>Limit Hard Inquiries</h3>
+        <p>Each loan or credit card application triggers a hard inquiry. Too many in a short period signals financial stress. Space out applications by at least 6 months.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Score</span>
+            <div class="progress-bar"><div class="progress-fill fill-warning" style="width:50%"></div></div>
+            <span>Medium</span>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-number">5</div>
+        <h3>Diversify Your Credit Mix</h3>
+        <p>Having different types of credit (credit card, auto loan, mortgage) shows lenders you can manage various obligations. Don't take on debt just for this though.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Score</span>
+            <div class="progress-bar"><div class="progress-fill fill-warning" style="width:40%"></div></div>
+            <span>Moderate</span>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-number">6</div>
+        <h3>Check Your Credit Report for Errors</h3>
+        <p>About 1 in 5 credit reports contain errors. Dispute inaccuracies with the credit bureau — a corrected error can boost your score instantly.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Score</span>
+            <div class="progress-bar"><div class="progress-fill fill-success" style="width:70%"></div></div>
+            <span>High</span>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-number">7</div>
+        <h3>Keep Your Debt-to-Income Ratio Low</h3>
+        <p>Lenders look at how much of your income goes to debt payments. Aim for a DTI below 36%. Pay down existing debt before applying for new loans.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Approval</span>
+            <div class="progress-bar"><div class="progress-fill fill-success" style="width:85%"></div></div>
+            <span>Very High</span>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-number">8</div>
+        <h3>Build an Emergency Fund First</h3>
+        <p>Having 3–6 months of expenses saved shows financial stability. Some lenders consider savings when making decisions, and it protects you from defaulting.</p>
+        <div class="tip-impact">
+            <span class="impact-label">Impact on Approval</span>
+            <div class="progress-bar"><div class="progress-fill fill-warning" style="width:55%"></div></div>
+            <span>Medium</span>
+        </div>
+    </div>
+</div>
+
+<section class="card cta-section" style="margin-top:2rem;">
+    <h2>Ready to Check Your Eligibility?</h2>
+    <p>Put these tips into practice and see where you stand right now.</p>
+    <a href="/check" class="btn btn-primary btn-lg">Check Eligibility &rarr;</a>
+</section>
+{% endblock %}

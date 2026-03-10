@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LoanSafe AI{% endblock %} — Smart Loan Decisions</title>
+    <meta name="description" content="Free AI-powered loan eligibility checker, EMI calculator, and credit tips. Make smarter borrowing decisions with transparent, trustworthy AI.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-brand">🛡️ LoanSafe AI</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+        <div class="nav-links" id="navLinks">
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+            <a href="/check" class="{% if request.path == '/check' %}active{% endif %}">Check Eligibility</a>
+            <a href="/emi" class="{% if request.path == '/emi' %}active{% endif %}">EMI Calculator</a>
+            <a href="/analyze" class="{% if request.path == '/analyze' %}active{% endif %}">Analyze Data</a>
+            <a href="/tips" class="{% if request.path == '/tips' %}active{% endif %}">Credit Tips</a>
+            <a href="/how-it-works" class="{% if request.path == '/how-it-works' %}active{% endif %}">How It Works</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h4>🛡️ LoanSafe AI</h4>
+                <p>Free, transparent AI-powered loan tools. No sign-up required.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Tools</h4>
+                <a href="/check">Eligibility Checker</a>
+                <a href="/emi">EMI Calculator</a>
+                <a href="/analyze">Dataset Analyzer</a>
+            </div>
+            <div class="footer-col">
+                <h4>Learn</h4>
+                <a href="/tips">Credit Tips</a>
+                <a href="/how-it-works">How It Works</a>
+                <a href="/dashboard">Model Dashboard</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LoanSafe AI &mdash; Built with Trustworthy AI principles. For educational purposes. Not financial advice.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('navToggle').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('open');
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

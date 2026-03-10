@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}EMI Calculator{% endblock %}
+
+{% block content %}
+<h1 class="page-title">EMI Calculator</h1>
+<p class="page-subtitle">Plan your loan repayment. Enter the loan amount, interest rate, and tenure to see your monthly EMI and a full amortization schedule.</p>
+
+<div class="predict-layout">
+    <!-- Form -->
+    <section class="card form-card">
+        <h2>Loan Details</h2>
+        <form method="POST" action="/emi" id="emiForm">
+            <div class="form-stack">
+                <div class="form-group">
+                    <label for="principal">Loan Amount ($)</label>
+                    <input type="number" id="principal" name="principal" min="1" step="any" placeholder="e.g. 25000" required
+                           value="{{ request.form.get('principal', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="rate">Annual Interest Rate (%)</label>
+                    <input type="number" id="rate" name="rate" min="0" max="50" step="0.01" placeholder="e.g. 8.5" required
+                           value="{{ request.form.get('rate', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="months">Loan Term (months)</label>
+                    <input type="number" id="months" name="months" min="1" max="360" placeholder="e.g. 36" required
+                           value="{{ request.form.get('months', '') }}">
+                    <span class="form-hint">Tip: 12 months = 1 year, 60 = 5 years, 360 = 30 years</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Calculate EMI</button>
+        </form>
+    </section>
+
+    <!-- Result -->
+    {% if calc %}
+    <section class="card result-card" id="emiResult">
+        {% if calc.error %}
+            <div class="result-error">
+                <h2>⚠️ Error</h2>
+                <p>{{ calc.error }}</p>
+            </div>
+        {% else %}
+            <div class="emi-hero">
+                <span class="emi-hero-label">Your Monthly EMI</span>
+                <span class="emi-hero-value">${{ "{:,.2f}".format(calc.emi) }}</span>
+            </div>
+
+            <div class="emi-summary-grid">
+                <div class="emi-stat">
+                    <span class="emi-stat-val">${{ "{:,.2f}".format(calc.principal) }}</span>
+                    <span class="emi-stat-label">Principal</span>
+                </div>
+                <div class="emi-stat">
+                    <span class="emi-stat-val">${{ "{:,.2f}".format(calc.total_interest) }}</span>
+                    <span class="emi-stat-label">Total Interest</span>
+                </div>
+                <div class="emi-stat">
+                    <span class="emi-stat-val">${{ "{:,.2f}".format(calc.total_payment) }}</span>
+                    <span class="emi-stat-label">Total Payment</span>
+                </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="chart-card-small">
+                <canvas id="emiPieChart"></canvas>
+            </div>
+
+            <!-- Amortization Schedule -->
+            <h3 style="margin-top:1.5rem; margin-bottom:.75rem;">Amortization Schedule</h3>
+            <div class="table-wrap" style="max-height: 400px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>EMI</th>
+                            <th>Principal</th>
+                            <th>Interest</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in calc.schedule %}
+                        <tr>
+                            <td>{{ row.month }}</td>
+                            <td>${{ "{:,.2f}".format(row.emi) }}</td>
+                            <td>${{ "{:,.2f}".format(row.principal) }}</td>
+                            <td>${{ "{:,.2f}".format(row.interest) }}</td>
+                            <td>${{ "{:,.2f}".format(row.balance) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+    {% else %}
+    <section class="card placeholder-card">
+        <div class="placeholder-content">
+            <span class="placeholder-icon">🧮</span>
+            <h3>Your EMI Breakdown Here</h3>
+            <p>Enter loan details and hit "Calculate EMI" to see monthly payments, total interest, and a full amortization schedule.</p>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if calc and not calc.error %}
+<script>
+    new Chart(document.getElementById("emiPieChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Principal", "Interest"],
+            datasets: [{
+                data: [{{ calc.principal }}, {{ calc.total_interest }}],
+                backgroundColor: ["#6366f1", "#f59e0b"],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom", labels: { color: "#e2e8f0" } } }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

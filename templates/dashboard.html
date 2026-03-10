@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Model Dashboard</h1>
+
+<!-- Metric Cards -->
+<section class="card-grid">
+    <div class="card metric-card">
+        <span class="metric-value">{{ metrics.accuracy }}%</span>
+        <span class="metric-label">Accuracy</span>
+    </div>
+    <div class="card metric-card">
+        <span class="metric-value">{{ metrics.precision }}%</span>
+        <span class="metric-label">Precision</span>
+    </div>
+    <div class="card metric-card">
+        <span class="metric-value">{{ metrics.recall }}%</span>
+        <span class="metric-label">Recall</span>
+    </div>
+    <div class="card metric-card">
+        <span class="metric-value">{{ metrics.f1 }}%</span>
+        <span class="metric-label">F1 Score</span>
+    </div>
+</section>
+
+<!-- Charts side by side -->
+<section class="chart-row">
+    <div class="card chart-card">
+        <h2>Trust Decision Distribution</h2>
+        <canvas id="decisionChart"></canvas>
+    </div>
+    <div class="card chart-card">
+        <h2>Confidence Score Distribution</h2>
+        <canvas id="confidenceChart"></canvas>
+    </div>
+</section>
+
+<!-- Drift Report -->
+<section class="card">
+    <h2>Data Drift Report
+        <span class="badge {% if drift_exists %}badge-danger{% else %}badge-success{% endif %}">
+            {% if drift_exists %}Drift Detected{% else %}No Drift{% endif %}
+        </span>
+    </h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Mean Difference</th>
+                    <th>Drift Detected</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in drift_data %}
+                <tr>
+                    <td>{{ row.feature }}</td>
+                    <td>{{ "%.4f"|format(row.mean_diff) }}</td>
+                    <td>
+                        {% if row.drift_detected %}
+                            <span class="badge badge-danger">Yes</span>
+                        {% else %}
+                            <span class="badge badge-success">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Sample Trust Decisions -->
+<section class="card">
+    <h2>Sample Trust Decisions <small>({{ total_samples }} test samples)</small></h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Confidence</th>
+                    <th>Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in sample_results %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ "%.2f"|format(row.confidence * 100) }}%</td>
+                    <td>
+                        <span class="badge
+                            {% if row.decision == 'AUTO_APPROVE' %}badge-success
+                            {% elif row.decision == 'REVIEW_REQUIRED' %}badge-warning
+                            {% else %}badge-danger{% endif %}">
+                            {{ row.decision }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Trust Decision Doughnut Chart
+    const decisionData = {{ decision_counts|safe }};
+    const colorMap = {
+        "AUTO_APPROVE": "#22c55e",
+        "REVIEW_REQUIRED": "#f59e0b",
+        "DO_NOT_TRUST": "#ef4444"
+    };
+    new Chart(document.getElementById("decisionChart"), {
+        type: "doughnut",
+        data: {
+            labels: Object.keys(decisionData),
+            datasets: [{
+                data: Object.values(decisionData),
+                backgroundColor: Object.keys(decisionData).map(k => colorMap[k] || "#6366f1"),
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom" } }
+        }
+    });
+
+    // Confidence Histogram
+    new Chart(document.getElementById("confidenceChart"), {
+        type: "bar",
+        data: {
+            labels: {{ conf_labels|safe }},
+            datasets: [{
+                label: "Count",
+                data: {{ conf_values|safe }},
+                backgroundColor: "#6366f1",
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: "Count" } },
+                x: { title: { display: true, text: "Confidence Range" } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Check Loan Eligibility{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Check Your Loan Eligibility</h1>
+<p class="page-subtitle">Fill in your details below. Our AI will assess your approval chances, give you a confidence score, and offer personalized tips — all in seconds.</p>
+
+<div class="predict-layout">
+    <!-- Form -->
+    <section class="card form-card">
+        <h2>Your Details</h2>
+        <form method="POST" action="/check" id="checkForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" min="18" max="100" placeholder="e.g. 30" required
+                           value="{{ request.form.get('age', '') }}">
+                    <span class="form-hint">Must be 18 or older</span>
+                </div>
+                <div class="form-group">
+                    <label for="income">Annual Income ($)</label>
+                    <input type="number" id="income" name="income" min="0" placeholder="e.g. 60000" required
+                           value="{{ request.form.get('income', '') }}">
+                    <span class="form-hint">Your yearly income before taxes</span>
+                </div>
+                <div class="form-group">
+                    <label for="credit_score">Credit Score</label>
+                    <input type="number" id="credit_score" name="credit_score" min="300" max="900" placeholder="e.g. 720" required
+                           value="{{ request.form.get('credit_score', '') }}">
+                    <span class="form-hint">Typically 300–900</span>
+                </div>
+                <div class="form-group">
+                    <label for="loan_amount">Loan Amount ($)</label>
+                    <input type="number" id="loan_amount" name="loan_amount" min="1" placeholder="e.g. 25000" required
+                           value="{{ request.form.get('loan_amount', '') }}">
+                    <span class="form-hint">How much you want to borrow</span>
+                </div>
+                <div class="form-group">
+                    <label for="loan_term">Loan Term</label>
+                    <select id="loan_term" name="loan_term" required>
+                        <option value="">Select term</option>
+                        {% for t in [12, 24, 36, 48, 60] %}
+                        <option value="{{ t }}" {% if request.form.get('loan_term') == t|string %}selected{% endif %}>
+                            {{ t }} months ({{ (t/12)|round(1) }} yr)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="employment_status">Employment Status</label>
+                    <select id="employment_status" name="employment_status" required>
+                        <option value="">Select status</option>
+                        {% for s in ["Employed", "Self-Employed", "Unemployed"] %}
+                        <option value="{{ s }}" {% if request.form.get('employment_status') == s %}selected{% endif %}>
+                            {{ s }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Check Eligibility</button>
+        </form>
+    </section>
+
+    <!-- Result -->
+    {% if result %}
+    <section class="card result-card" id="resultSection">
+        {% if result.error %}
+            <div class="result-error">
+                <h2>⚠️ Something Went Wrong</h2>
+                <p>{{ result.error }}</p>
+            </div>
+        {% else %}
+            <div class="result-prediction {{ 'approved' if result.approved else 'rejected' }}">
+                <span class="result-icon">{% if result.approved %}✅{% else %}❌{% endif %}</span>
+                <div>
+                    <span class="result-text">{{ result.prediction }}</span>
+                    <span class="result-confidence-inline">{{ result.confidence }}% confidence</span>
+                </div>
+            </div>
+
+            <!-- Trust Decision -->
+            <div class="result-trust-banner
+                {% if result.decision == 'AUTO_APPROVE' %}trust-high
+                {% elif result.decision == 'REVIEW_REQUIRED' %}trust-medium
+                {% else %}trust-low{% endif %}">
+                {% if result.decision == 'AUTO_APPROVE' %}
+                    <strong>High Confidence</strong> — The AI is very confident in this prediction.
+                {% elif result.decision == 'REVIEW_REQUIRED' %}
+                    <strong>Moderate Confidence</strong> — Consider consulting a financial advisor before proceeding.
+                {% else %}
+                    <strong>Low Confidence</strong> — This prediction may not be reliable. Please seek professional advice.
+                {% endif %}
+            </div>
+
+            <!-- Probability Breakdown -->
+            <div class="prob-bars">
+                <div class="prob-row">
+                    <span class="prob-label">Approval Probability</span>
+                    <div class="progress-bar"><div class="progress-fill fill-success" style="width:{{ result.probabilities.approve }}%"></div></div>
+                    <span class="prob-val">{{ result.probabilities.approve }}%</span>
+                </div>
+                <div class="prob-row">
+                    <span class="prob-label">Rejection Probability</span>
+                    <div class="progress-bar"><div class="progress-fill fill-danger" style="width:{{ result.probabilities.reject }}%"></div></div>
+                    <span class="prob-val">{{ result.probabilities.reject }}%</span>
+                </div>
+            </div>
+
+            <!-- EMI Estimate -->
+            <div class="emi-preview">
+                <span class="emi-label">Estimated Monthly EMI</span>
+                <span class="emi-value">${{ "{:,.2f}".format(result.emi) }}</span>
+                <a href="/emi" class="feature-link">See full breakdown &rarr;</a>
+            </div>
+
+            <!-- Personalized Tips -->
+            <div class="tips-section">
+                <h3>💡 Personalized Tips</h3>
+                <ul class="tips-list">
+                    {% for tip in result.tips %}
+                    <li>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </section>
+    {% else %}
+    <!-- Placeholder when no result yet -->
+    <section class="card placeholder-card">
+        <div class="placeholder-content">
+            <span class="placeholder-icon">📋</span>
+            <h3>Your Results Will Appear Here</h3>
+            <p>Fill in the form and click "Check Eligibility" to get your AI-powered assessment with personalized tips.</p>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Scroll to result on mobile after form submission
+    {% if result %}
+    if (window.innerWidth < 769) {
+        document.getElementById('resultSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    {% endif %}
+</script>
+{% endblock %}
